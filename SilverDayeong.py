@@ -98,6 +98,6 @@ async def on_message(message) :
             - !금다형 티어
             - !help""")  
 
-app.run('ODgzOTkzMTg1MTM3ODg1MjA0.YTSAzw.G9vatmvO05K8kcK88hX5N07QCyE')
+app.run('')
 
 
