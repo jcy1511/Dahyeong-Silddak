@@ -5,13 +5,13 @@ import requests
 from bs4 import BeautifulSoup
 import re
 
-url = "https://www.op.gg/summoner/userName=화면고정망나니"
-res = requests.get(url)
-res.raise_for_status()
-soup = BeautifulSoup(res.text, "lxml")
-
 
 def set():
+
+    url = "https://www.op.gg/summoner/userName=화면고정망나니"
+    res = requests.get(url)
+    res.raise_for_status()
+    soup = BeautifulSoup(res.text, "lxml")
     global 놀리기, 최근전적, 연승연패, 현재티어, lr, wlr, kstatus
 
     tier_rank = soup.find("div",{"class":"TierRank"})
@@ -98,6 +98,6 @@ async def on_message(message) :
             - !금다형 티어
             - !help""")  
 
-app.run('')
+app.run('ODgzOTkzMTg1MTM3ODg1MjA0.YTSAzw.G9vatmvO05K8kcK88hX5N07QCyE')
 
 
