@@ -75,8 +75,15 @@ async def on_message(message) :
             else :
                 await message.channel.send(f"금다형 현재 {연승연패}중 ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ 쭉 흐름타고 브론즈까지 가보자")
     elif message.content == "!금다형 티어":
-        await message.channel.send(현재티어)   
+        await message.channel.send(현재티어)  
+    elif message.content == "!help" :
+        await message.channel.send("""***명령어리스트***
+        - !안녕
+        - !금다형
+        - !금다형 최근전적
+        - !금다형 티어
+        - !help""")  
 
-app.run('토큰은 비밀')
+app.run('토큰은비밀')
 
 
