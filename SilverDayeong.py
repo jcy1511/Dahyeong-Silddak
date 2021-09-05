@@ -33,7 +33,7 @@ def set():
 
     wins = re.sub('\D','',soup.find("span",{"class":"wins"}).get_text())
     losses = re.sub('\D','',soup.find("span",{"class":"losses"}).get_text())
-    현재티어 = f"현재 티어 : {tier_rank.get_text()} {lp}"
+    현재티어 = f"현재 티어 : {tier_rank.get_text()} | {lp}"
     최근전적 = f"최근 전적 : {recent_status_total.get_text()}전 {recent_status_win.get_text()}승 {recent_status_lose.get_text()}패 (승률 {round(100*(int(recent_status_win.get_text())/int(recent_status_total.get_text())))}%)"
     놀리기 = f"{int(wins)+int(losses)}판 {ktier}딱 ㅋㅋ"
 
