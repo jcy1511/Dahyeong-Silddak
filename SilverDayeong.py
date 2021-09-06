@@ -6,9 +6,9 @@ from bs4 import BeautifulSoup
 import re
 
 
-def set():
+def set(nickname):
 
-    url = "https://www.op.gg/summoner/userName=화면고정망나니"
+    url = "https://www.op.gg/summoner/userName="+ nickname
     res = requests.get(url)
     res.raise_for_status()
     soup = BeautifulSoup(res.text, "lxml")
@@ -20,7 +20,13 @@ def set():
 
     ktier = ("아" if tier == "Iron "
                 else "브" if tier == "Bronze "
-                else "실" if  tier == "Silver "
+                else "실" if tier == "Silver "
+                else "골" if tier == "Gold "
+                else "플" if tier == "Platinum "
+                else "다" if tier == "Diamond "
+                else "마" if tier == "Master"
+                else "그마" if tier == "Grandmaster"
+                else "챌" if tier == "Challenger"
                 else "error")
     ktier = ktier + tiern
 
@@ -74,28 +80,30 @@ async def on_message(message) :
     if message.content == "!안녕" :
         await message.channel.send("hi")
     else :
-        set()
-        if message.content == "!금다형" :
-            await message.channel.send(놀리기)
-
-        elif message.content == "!금다형 최근전적":
-            await message.channel.send(최근전적)
-            await message.channel.send(kstatus)
-            if lr > 1 :
-                if wlr == "연승" :
-                    await message.channel.send(f"{연승연패}중... 이제 질 타이밍 ㄹㅇㅋㅋ")
-                else :
-                    await message.channel.send(f"금다형 현재 {연승연패}중 ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ 쭉 흐름타고 브론즈까지 가보자")
-
-        elif message.content == "!금다형 티어":
-            await message.channel.send(현재티어)  
+        if message.content.startswith("!최근전적"):
+            try :
+                set(message.content[6:])
+                mes = 최근전적+"\n"+kstatus+"\n"
+                if lr > 1 :
+                    if wlr == "연승" :
+                        mes += f"{연승연패}중... 이제 질 타이밍 ㄹㅇㅋㅋ"
+                    else :
+                        mes += f"{message.content[6:]} 현재 {연승연패}중 ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ 쭉 흐름타고 아이언까지 가보자"
+                await message.channel.send(mes)
+            except :
+                await message.channel.send("그런 계정 없는데 닉네임 다시 확인 ㄱㄱ")
+        elif message.content.startswith("!티어"):
+            try :
+                set(message.content[4:])
+                await message.channel.send(현재티어+"\n"+놀리기)  
+            except :
+                await message.channel.send("그런 계정 없는데 닉네임 다시 확인 ㄱㄱ")
 
         elif message.content == "!help" :
             await message.channel.send("""**명령어리스트**    
             - !안녕
-            - !금다형
-            - !금다형 최근전적
-            - !금다형 티어
+            - !티어 [닉네임]
+            - !최근전적 [닉네임]
             - !help""")  
 
 app.run('')
