@@ -12,57 +12,62 @@ def set(nickname):
     res = requests.get(url)
     res.raise_for_status()
     soup = BeautifulSoup(res.text, "lxml")
-    global 놀리기, 최근전적, 연승연패, 현재티어, lr, wlr, kstatus
+    try :
+        global 놀리기, 최근전적, 연승연패, 현재티어, kstatus, lr, wlr
 
-    tier_rank = soup.find("div",{"class":"TierRank"})
-    tier = re.sub('\d', '', tier_rank.get_text())
-    tiern = re.sub('\D', '', tier_rank.get_text())
+        status=soup.find_all("div",attrs={"class":"GameResult"})
+        for i in range(len(status)) :
+            status[i] = re.sub('\n|\t','',status[i].get_text())
+        status.append(0)
 
-    ktier = ("아" if tier == "Iron "
-                else "브" if tier == "Bronze "
-                else "실" if tier == "Silver "
-                else "골" if tier == "Gold "
-                else "플" if tier == "Platinum "
-                else "다" if tier == "Diamond "
-                else "마" if tier == "Master"
-                else "그마" if tier == "Grandmaster"
-                else "챌" if tier == "Challenger"
-                else "error")
-    ktier = ktier + tiern
+        i=0
+        lr = 1
+        while status[i]==status[i+1] :
+            lr+=1
+            i+=1
+        if status[0] == 'Victory' :
+            wlr = '연승'
+        else :
+            wlr = '연패'
+        연승연패 = str(lr)+wlr
 
-    lp = soup.find("span",{"class":"LeaguePoints"})
-    lp = re.sub("	|\n","",lp.get_text())
+        kstatus = re.sub('Victory','O ',str(status[0:20]))
+        kstatus = re.sub('Defeat','X ',kstatus)
+        kstatus = re.sub("\[|\]|\,|'","",kstatus)
 
-    recent_status_total = soup.find("span",{"class":"total"})
-    recent_status_win = recent_status_total.find_next_sibling()
-    recent_status_lose = recent_status_win.find_next_sibling()
+        recent_status_total = soup.find("span",{"class":"total"})
+        recent_status_win = recent_status_total.find_next_sibling()
+        recent_status_lose = recent_status_win.find_next_sibling()
+        최근전적 = f"최근 전적 : {recent_status_total.get_text()}전 {recent_status_win.get_text()}승 {recent_status_lose.get_text()}패 (승률 {round(100*(int(recent_status_win.get_text())/int(recent_status_total.get_text())))}%)\n"
 
-    wins = re.sub('\D','',soup.find("span",{"class":"wins"}).get_text())
-    losses = re.sub('\D','',soup.find("span",{"class":"losses"}).get_text())
-    현재티어 = f"현재 티어 : {tier_rank.get_text()} | {lp}"
-    최근전적 = f"최근 전적 : {recent_status_total.get_text()}전 {recent_status_win.get_text()}승 {recent_status_lose.get_text()}패 (승률 {round(100*(int(recent_status_win.get_text())/int(recent_status_total.get_text())))}%)"
-    놀리기 = f"{int(wins)+int(losses)}판 {ktier}딱 ㅋㅋ"
+        tier_rank = soup.find("div",{"class":"TierRank"})
+        tier = re.sub('\d', '', tier_rank.get_text())
+        tiern = re.sub('\D', '', tier_rank.get_text())
 
-    status=soup.find_all("div",attrs={"class":"GameResult"})
-    for i in range(len(status)) :
-        status[i] = re.sub('\n|\t','',status[i].get_text())
-    status.append(0)
+        ktier = ("아" if tier == "Iron "
+                    else "브" if tier == "Bronze "
+                    else "실" if tier == "Silver "
+                    else "골" if tier == "Gold "
+                    else "플" if tier == "Platinum "
+                    else "다" if tier == "Diamond "
+                    else "마" if tier == "Master"
+                    else "그마" if tier == "Grandmaster"
+                    else "챌" if tier == "Challenger"
+                    else "error")
+        ktier = ktier + tiern
 
-    i=0
-    lr = 1
-    while status[i]==status[i+1] :
-        lr+=1
-        i+=1
-    if status[0] == 'Victory' :
-        wlr = '연승'
-    else :
-        wlr = '연패'
-    연승연패 = str(lr)+wlr
+        lp = soup.find("span",{"class":"LeaguePoints"})
+        lp = re.sub("	|\n","",lp.get_text())
 
-    kstatus = re.sub('Victory','O ',str(status[0:20]))
-    kstatus = re.sub('Defeat','X ',kstatus)
-    kstatus = re.sub("\[|\]|\,|'","",kstatus)
+        wins = re.sub('\D','',soup.find("span",{"class":"wins"}).get_text())
+        losses = re.sub('\D','',soup.find("span",{"class":"losses"}).get_text())
+        현재티어 = f"현재 티어 : {tier_rank.get_text()} | {lp}"
+        놀리기 = f"{int(wins)+int(losses)}판 {ktier}딱 ㅋㅋ"
 
+    
+    except AttributeError :
+        놀리기 = "쫄려서 랭 못 돌려서 언랭이네 ㅉㅉ"
+        현재티어 = "현재티어 : Unranked"
 
 
 
@@ -83,7 +88,7 @@ async def on_message(message) :
         if message.content.startswith("!최근전적"):
             try :
                 set(message.content[6:])
-                mes = 최근전적+"\n"+kstatus+"\n"
+                mes = 최근전적+kstatus+"\n"
                 if lr > 1 :
                     if wlr == "연승" :
                         mes += f"{연승연패}중... 이제 질 타이밍 ㄹㅇㅋㅋ"
@@ -104,7 +109,7 @@ async def on_message(message) :
             - !안녕
             - !티어 [닉네임]
             - !최근전적 [닉네임]
-            - !help""")  
+            - !help""")   
 
 app.run('')
 
